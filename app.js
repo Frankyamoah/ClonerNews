@@ -1,30 +1,75 @@
-//Fetching URL
+// // url of comments api
+// var topCommentsUrl = "https://hacker-news.firebaseio.com/v0/item/2921983.json?print=pretty";
 
-// api url
-// const api_url =
-// 	"https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty";
+// //url of ask api
+// var topAskUrl = "https://hacker-news.firebaseio.com/v0/item/121003.json?print=pretty";
 
-// fetch(api_url)
-//   .then(response => response.json())
-//   .then(data => console.log(data))
-//   .catch(error => console.error(error));
+// //url of job api
+// var topJob = "https://hacker-news.firebaseio.com/v0/item/192327.json?print=pretty";
+
+// //url of poll api
+// var topPoll = "https://hacker-news.firebaseio.com/v0/item/126809.json?print=pretty";
+
+// //fetch data
+// const fetchData = (url) => {
+//     return new Promise((resolve, reject) => {
+//         fetch(url)
+//             .then((res) => res.json())
+//             .then((data) => resolve(data))
+//             .catch((err) => reject(err));
+//     });
+// };
+
+// //show Data
+// const showData = async () => {
+//     var data = await fetchData(topCommentsUrl);
+//     console.log(data)
+//     data.map(async (d) => {
+//         let newsData = await fetchData(`${topJob}${d}.json`);
+//         console.log(newsData);
+//     })
+// };
+
+// showData();
 
 
-  fetch('https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty')
-  .then(response => response.json())
-  .then(data => {
-    const dataList = document.getElementById('data-list');
-    const li = document.createElement('li');
-    li.textContent = data.title;
-    dataList.appendChild(li);
-  })
-  .catch(error => console.error(error));
+// url of comments api
+const topCommentsUrl = "https://hacker-news.firebaseio.com/v0/item/2921983.json?print=pretty";
 
-  
+// url of ask api
+const topAskUrl = "https://hacker-news.firebaseio.com/v0/item/121003.json?print=pretty";
 
+// url of job api
+const topJobUrl = "https://hacker-news.firebaseio.com/v0/item/192327.json?print=pretty";
 
+// url of poll api
+const topPollUrl = "https://hacker-news.firebaseio.com/v0/item/126809.json?print=pretty";
 
+// fetch data
+const fetchData = async (url) => {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
+// show data
+const showData = async () => {
+    try {
+        const data = await fetchData(topCommentsUrl);
+        console.log(data);
+        await Promise.all(
+            data.kids.map(async (kid) => {
+                const newsData = await fetchData(`${topJobUrl}${kid}.json`);
+                console.log(newsData);
+            })
+        );
+    } catch (error) {
+        console.log(error);
+    }
+};
 
-
-
+showData();
