@@ -176,24 +176,8 @@ function fetchJobs() {
         });
 };
 
-// function fetchPolls() {
-//   fetch('https://hacker-news.firebaseio.com/v0/topstories.json')
-//   .then(response => response.json())
-//   .then(data => {
-//     const polls = data.slice(0, 10);
-//     polls.forEach(pollId => {
-//       fetch(`https://hacker-news.firebaseio.com/v0/item/${pollId}.json`)
-//         .then(response => response.json())
-//         .then(poll => {
-//           const pollContainer = document.getElementById('polls-container');
-//           const pollLink = document.createElement('a');
-//           pollLink.href = `https://news.ycombinator.com/item?id=${poll.id}`;
-//           pollLink.textContent = poll.title;
-//           pollContainer.appendChild(pollLink);
-//         });
-//     });
-//   });
-// };
+const fetchJobsThrottled = throttle(fetchJobs, 5000);
+fetchJobsThrottled();
 
 function fetchPollsThrottled() {
     const POLL_API_ENDPOINT = 'https://hacker-news.firebaseio.com/v0/topstories.json';
