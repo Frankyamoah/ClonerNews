@@ -62,10 +62,12 @@
 
     // Allows for time post was posted to be displayed
     const time = document.createElement('p')
-    const sec = Math.floor((post.time / 1000))
-    const mins = Math.floor((post.time / 1000 / 60 ))
-    const hours = Math.floor((post.time / 1000 / 60 / 60))
-    const days = Math.floor((post.time / 1000 / 60 / 60 / 24))
+    const currentTime = Math.floor(Date.now() / 1000);
+    const timeDiff = currentTime - post.time; 
+    const sec = Math.floor((timeDiff))
+    const mins = Math.floor((timeDiff / 60))
+    const hours = Math.floor((timeDiff / 60 / 60))
+    const days = Math.floor((timeDiff / 60 / 60 / 24))
     if (sec < 60){
       time.textContent = `This was posted ${sec} seconds ago`
     }
@@ -111,7 +113,7 @@
           posts.push(post);
         }
       // utilise the time key in order to sort items from newest to oldest
-    posts.sort((a, b) => a.time - b.time);
+      posts.sort((a, b)  => b.time - a.time);
       // Display the sorted posts
     displayOrderedPosts(posts, postType);
   }
