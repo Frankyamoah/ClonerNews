@@ -91,3 +91,9 @@ if (postId) {
   displayPost(postId);
   displayComments(postId);
 }
+
+const returnBtn = document.getElementById("return-btn");
+
+returnBtn.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
