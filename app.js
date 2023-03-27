@@ -1,3 +1,4 @@
+
 const apiURL = "https://hacker-news.firebaseio.com/v0/";
 const liveDataContainer = document.getElementById("live-data-container");
 const storyContainer = document.getElementById("stories-container");
@@ -7,6 +8,13 @@ const pollContainer = document.getElementById("polls-container");
 const loadMoreStoryBtn = document.getElementById("load-stories");
 const loadMoreJobBtn = document.getElementById("load-jobs");
 const loadMorePollBtn = document.getElementById("load-polls");
+
+//Live
+document.addEventListener('DOMContentLoaded', () => {
+  const liveDataContainer = document.getElementById("live-data-container");
+  // Your code here
+});
+//
 
 let max = 10; // maximum number of posts on page
 
@@ -191,38 +199,13 @@ function throttle(func, ms) {
   return wrapper;
 }
 
-//Live Updates
+//Concerning the perent
 /*
-// Get the element where you want to display the live data
-const liveDataElement = document.getElementById("live-data");
-
-// Function to update the live data
-function updateLiveData() {
-  // Code to fetch the latest data and update the element goes here
-  // For example:
-  fetch("https://example.com/api/live-data")
-    .then(response => response.json())
-    .then(data => {
-      liveDataElement.innerHTML = `Newest information: ${data}`;
-    })
-    .catch(error => {
-      console.error("Error fetching live data:", error);
-    });
-}
-
-// Update the live data every 5 seconds
-setInterval(updateLiveData, 5000);
+This means that when a user leaves a comment on a post (such as an article or a thread) on the CLonerNews website, 
+the comment must be associated with the correct post. Each comment has a unique identifier, 
+and it should be linked to the post it is commenting on through a parent ID field.
 */
-function updateLiveData() {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/get-latest-data', true);
-  xhr.onload = function () {
-    if (this.status == 200) {
-      document.getElementById('live-data').innerHTML = this.responseText;
-    }
-  };
-  xhr.send();
-}
-setInterval(updateLiveData, 5000); // call updateLiveData every 5 seconds
+
+
 
 
