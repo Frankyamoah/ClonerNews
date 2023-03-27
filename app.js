@@ -1,4 +1,3 @@
-
 const apiURL = "https://hacker-news.firebaseio.com/v0/";
 const liveDataContainer = document.getElementById("live-data-container");
 const storyContainer = document.getElementById("stories-container");
@@ -8,13 +7,6 @@ const pollContainer = document.getElementById("polls-container");
 const loadMoreStoryBtn = document.getElementById("load-stories");
 const loadMoreJobBtn = document.getElementById("load-jobs");
 const loadMorePollBtn = document.getElementById("load-polls");
-
-//Live
-document.addEventListener('DOMContentLoaded', () => {
-  const liveDataContainer = document.getElementById("live-data-container");
-  // Your code here
-});
-//
 
 let max = 10; // maximum number of posts on page
 
@@ -31,15 +23,27 @@ throttleGetItem();
 
 /* Function to fetch updates and display them in the live data container ensuring to clear 
 live container before fetching new items*/
+let hasUpdates = false;
+// Declare a variable to store the initial updates
+let initialUpdates = [];
 async function getAndDisplayUpdates() {
   // Clear the live data container
   liveDataContainer.innerHTML = "";
-  const response = await fetch("https://hacker-news.firebaseio.com/v0/updates.json");
+  const response = await fetch(
+    "https://hacker-news.firebaseio.com/v0/updates.json"
+  );
   const updates = await response.json();
 
+  // Compare the current updates with the previous updates
+  const newUpdates = updates.items.filter(
+    (item) => !previousUpdates.includes(item)
+  );
+
   // If there are new items proceed to fetch and display them
-  if (updates.items && updates.items.length > 0) {
-    for (const itemId of updates.items) {
+  if (newUpdates.length > 0) {
+    hasUpdates = true;
+    showUpdatePopup();
+    for (const itemId of newUpdates) {
       const item = await getItem(itemId);
       if (item.title && item.by) {
         const updateElement = document.createElement("div");
@@ -47,12 +51,29 @@ async function getAndDisplayUpdates() {
         liveDataContainer.appendChild(updateElement);
       }
     }
+    // Update the previous updates state
+    previousUpdates = updates.items;
+  } else {
+    hasUpdates = false;
+    showUpdatePopup();
   }
 }
+
+function showUpdatePopup() {
+  const popup = document.getElementById("popup-notification");
+  if (hasUpdates) {
+    popup.classList.remove("popup-hidden");
+    popup.classList.add("popup-visible");
+  } else {
+    popup.classList.remove("popup-visible");
+    popup.classList.add("popup-hidden");
+  }
+}
+
 const throttleUpdtaes = throttle(getAndDisplayUpdates, 5000);
-throttleUpdtaes()
-// Go get updated items intitally 
-getAndDisplayUpdates()
+throttleUpdtaes();
+// Go get updated items intitally
+getAndDisplayUpdates();
 
 // Set an interval to fetch and display updates every 5 seconds
 setInterval(getAndDisplayUpdates, 5000);
@@ -75,24 +96,24 @@ async function postDisplay(post, container) {
   author.textContent = `Author: ${post.by}`;
 
   // Allows for time post was posted to be displayed
-  const time = document.createElement('p')
+  const time = document.createElement("p");
   const currentTime = Math.floor(Date.now() / 1000);
   const timeDiff = currentTime - post.time;
-  const sec = Math.floor((timeDiff))
-  const mins = Math.floor((timeDiff / 60))
-  const hours = Math.floor((timeDiff / 60 / 60))
-  const days = Math.floor((timeDiff / 60 / 60 / 24))
+  const sec = Math.floor(timeDiff);
+  const mins = Math.floor(timeDiff / 60);
+  const hours = Math.floor(timeDiff / 60 / 60);
+  const days = Math.floor(timeDiff / 60 / 60 / 24);
   if (sec < 60) {
-    time.textContent = `This was posted ${sec} seconds ago`
+    time.textContent = `This was posted ${sec} seconds ago`;
   }
   if (sec > 60 && mins < 60) {
-    time.textContent = `This was posted ${mins} minutes ago`
+    time.textContent = `This was posted ${mins} minutes ago`;
   }
   if (mins > 60 && hours < 24) {
-    time.textContent = `This was posted ${hours} hours ago`
+    time.textContent = `This was posted ${hours} hours ago`;
   }
   if (hours > 24 && days >= 1) {
-    time.textContent = `This was posted ${days} days ago`
+    time.textContent = `This was posted ${days} days ago`;
   }
 
   postElement.appendChild(title);
@@ -103,8 +124,8 @@ async function postDisplay(post, container) {
   when post has comments attached */
   if (post.kids && post.kids.length > 0) {
     const comment = document.createElement("p");
-    const commentLink = document.createElement('a');
-    commentLink.textContent = 'comments';
+    const commentLink = document.createElement("a");
+    commentLink.textContent = "comments";
     commentLink.href = `comments.html?id=${post.id}`; // Link to the comments page
     comment.appendChild(commentLink);
 
@@ -121,7 +142,7 @@ async function getAndDisplayPosts(maxItems, postType) {
   //array of ids
   const ids = await response.json();
   // fetch the posts and place in posts array
-  const posts = []
+  const posts = [];
   for (let i = 0; i < maxItems; i++) {
     const post = await getItem(ids[i]);
     posts.push(post);
@@ -133,46 +154,80 @@ async function getAndDisplayPosts(maxItems, postType) {
   displayOrderedPosts(posts, postType);
 }
 const throttleDisplayPosts = throttle(getAndDisplayPosts, 5000);
-throttleDisplayPosts()
+throttleDisplayPosts();
 
 // function to display ordered posts which is done in the function after this
 function displayOrderedPosts(posts, postType) {
   for (const post of posts) {
-    if (postType === 'top' || postType === "best" || postType === "new") {
+    if (postType === "top" || postType === "best" || postType === "new") {
       postDisplay(post, storyContainer);
     }
-    if (postType === 'job') {
+    if (postType === "job") {
       postDisplay(post, jobContainer);
     }
-    if (postType === 'ask' || postType === 'show') {
+    if (postType === "ask" || postType === "show") {
       postDisplay(post, pollContainer);
     }
   }
 }
 
 //display relevant posts by calling getAndDisplay function
-getAndDisplayPosts(max, 'new');
-getAndDisplayPosts(max, 'job');
-getAndDisplayPosts(max, 'ask');
-
-loadMoreJobBtn.addEventListener('click', () => {
+getAndDisplayPosts(max, "new");
+getAndDisplayPosts(max, "job");
+getAndDisplayPosts(max, "ask");
+loadMoreJobBtn.addEventListener("click", async () => {
   max += 10;
-  getAndDisplayPosts(max, 'job');
+  const response = await fetch(`${apiURL}jobstories.json`);
+  const ids = await response.json();
+  const posts = [];
+  for (let i = max - 10; i < max; i++) {
+    const post = await getItem(ids[i]);
+    posts.push(post);
+  }
+  posts.sort((a, b) => b.time - a.time);
+  displayOrderedPosts(posts, "job");
 });
 
-loadMorePollBtn.addEventListener('click', () => {
+loadMorePollBtn.addEventListener("click", () => {
   max += 10;
-  getAndDisplayPosts(max, 'ask');
-  getAndDisplayPosts(max, 'show');
+  Promise.all([
+    getAndDisplayPosts(max, "ask"),
+    getAndDisplayPosts(max, "show"),
+  ]).then(([askPosts, showPosts]) =>
+    displayOrderedPosts([...askPosts, ...showPosts], "poll")
+  );
 });
 
-loadMoreStoryBtn.addEventListener('click', () => {
+loadMoreStoryBtn.addEventListener("click", () => {
   max += 10;
-  getAndDisplayPosts(max, 'top');
-  getAndDisplayPosts(max, 'best');
-  getAndDisplayPosts(max, 'new');
+  Promise.all([
+    getAndDisplayPosts(max, "top"),
+    getAndDisplayPosts(max, "best"),
+    getAndDisplayPosts(max, "new"),
+  ]).then(([topPosts, bestPosts, newPosts]) =>
+    displayOrderedPosts(
+      [...topPosts, ...bestPosts, ...newPosts],
+      "story"
+    )
+  );
 });
 
+
+
+
+document
+  .getElementById("popup-notification")
+  .addEventListener("click", (event) => {
+    if (event.target.tagName === "A") {
+      // Toggle the visibility of the popup
+      const popup = document.getElementById("popup-notification");
+      popup.classList.toggle("popup-visible");
+      popup.classList.toggle("popup-hidden");
+
+      // Refresh the page
+      location.reload();
+    }
+  });
 
 // Throttle func
 
@@ -199,13 +254,38 @@ function throttle(func, ms) {
   return wrapper;
 }
 
-//Concerning the perent
+//Live Updates
 /*
-This means that when a user leaves a comment on a post (such as an article or a thread) on the CLonerNews website, 
-the comment must be associated with the correct post. Each comment has a unique identifier, 
-and it should be linked to the post it is commenting on through a parent ID field.
+// Get the element where you want to display the live data
+const liveDataElement = document.getElementById("live-data");
+
+// Function to update the live data
+function updateLiveData() {
+  // Code to fetch the latest data and update the element goes here
+  // For example:
+  fetch("https://example.com/api/live-data")
+    .then(response => response.json())
+    .then(data => {
+      liveDataElement.innerHTML = `Newest information: ${data}`;
+    })
+    .catch(error => {
+      console.error("Error fetching live data:", error);
+    });
+}
+
+// Update the live data every 5 seconds
+setInterval(updateLiveData, 5000);
 */
-
-
+// function updateLiveData() {
+//   var xhr = new XMLHttpRequest();
+//   xhr.open('GET', '/get-latest-data', true);
+//   xhr.onload = function () {
+//     if (this.status == 200) {
+//       document.getElementById('live-data').innerHTML = this.responseText;
+//     }
+//   };
+//   xhr.send();
+// }
+// setInterval(updateLiveData, 5000); // call updateLiveData every 5 seconds
 
 
