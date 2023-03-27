@@ -36,7 +36,7 @@ async function displayPost(itemId) {
   postElement.appendChild(title);
   postElement.appendChild(author);
   postElement.appendChild(date);
-  postElement.appendChild(score);
+  //postElement.appendChild(score);
   postElement.appendChild(text);
 
   postContainer.appendChild(postElement);
