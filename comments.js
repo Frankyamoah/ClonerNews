@@ -1,11 +1,45 @@
 
 const apiURL = "https://hacker-news.firebaseio.com/v0/";
+const postContainer = document.getElementById("post-container");
 const commentsContainer = document.getElementById("comments-container");
 
 async function getItem(id) {
   const response = await fetch(`${apiURL}item/${id}.json`);
   const data = await response.json();
   return data;
+}
+
+async function displayPost(itemId) {
+  const item = await getItem(itemId);
+
+  const postElement = document.createElement("div");
+  postElement.classList.add("post");
+
+  const title = document.createElement("h2");
+  const link = document.createElement("a");
+  link.href = item.url;
+  link.textContent = item.title;
+  title.appendChild(link);
+
+  const author = document.createElement("p");
+  author.textContent = `Author: ${item.by}`;
+
+  const date = document.createElement("p");
+  date.textContent = new Date(item.time * 1000).toLocaleString();
+
+  const score = document.createElement("p");
+  score.textContent = `Score: ${item.score}`;
+
+  const text = document.createElement("p");
+  text.innerHTML = item.text;
+
+  postElement.appendChild(title);
+  postElement.appendChild(author);
+  postElement.appendChild(date);
+  postElement.appendChild(score);
+  postElement.appendChild(text);
+
+  postContainer.appendChild(postElement);
 }
 
 async function displayComments(itemId) {
@@ -54,6 +88,6 @@ function getParameterByName(name, url) {
 
 const postId = getParameterByName("id");
 if (postId) {
+  displayPost(postId);
   displayComments(postId);
 }
-
